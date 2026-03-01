@@ -1,6 +1,6 @@
 name: caixa
-description: "O pacote caixa foi criado para simplificar e potencializar a criação de containers no Flutter, fornecendo uma solução mais flexível e reutilizável. Com a classe Caixa, você pode facilmente aplicar estilos personalizados, adicionar ações de toque e reutilizar configurações com a ajuda da classe Molde."
-version: 1.2.0
+description: "Crie interfaces Flutter com a agilidade usando a classe Div! Inspirado no HTML, gerencie estilos, interações (hover/click), animações e estado automático em um único widget mantendo código limpo."
+version: 2.0.0
 homepage: "https://github.com/RJ4G5/caixa"
 
 environment:
@@ -14,7 +14,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
