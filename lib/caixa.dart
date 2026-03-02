@@ -1,4 +1,4 @@
-library caixa;
+library;
 
 import 'package:flutter/material.dart';
 

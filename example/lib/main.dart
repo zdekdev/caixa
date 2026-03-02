@@ -59,16 +59,13 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   var moldeButton = Molde(
-      height: 80,
-      width: 150,
-      color: const Color(0xFF00838F),
-      borderRadius: BorderRadius.circular(5),
-      boxShadow: const [
-          BoxShadow(
-          blurRadius: 10,
-          color: Color.fromARGB(96, 0, 0, 0)
-        )
-      ],
+    height: 80,
+    width: 150,
+    color: const Color(0xFF00838F),
+    borderRadius: BorderRadius.circular(5),
+    boxShadow: const [
+      BoxShadow(blurRadius: 10, color: Color.fromARGB(96, 0, 0, 0))
+    ],
   );
 
   void _incrementCounter() {
@@ -134,89 +131,121 @@ class _MyHomePageState extends State<MyHomePage> {
             */
 
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  
                   Caixa(
                     height: 80,
                     width: 150,
                     color: const Color(0xFFD81B60),
                     borderRadius: BorderRadius.circular(5),
                     boxShadow: const [
-                       BoxShadow(
-                        blurRadius: 10,
-                        color: Color.fromARGB(96, 0, 0, 0)
-                      )
+                      BoxShadow(
+                          blurRadius: 10, color: Color.fromARGB(96, 0, 0, 0))
                     ],
                     child: const Center(
-                      child: Text("Caixa", style:  TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color.fromARGB(255, 230, 230, 230))),
+                      child: Text("Caixa",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color.fromARGB(255, 230, 230, 230))),
                     ),
                   ),
-
+                  Div(
+                    height: 80,
+                    width: 150,
+                    color: const Color(0xFFD81B60),
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: const [
+                      BoxShadow(
+                          blurRadius: 10, color: Color.fromARGB(96, 0, 0, 0))
+                    ],
+                    child: const Center(
+                      child: Text("Div",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color.fromARGB(255, 230, 230, 230))),
+                    ),
+                  ),
                   Container(
                     height: 80,
                     width: 150,
                     decoration: BoxDecoration(
-                        color: const Color(0xFFD81B60),
-                        borderRadius: BorderRadius.circular(5),
-                        boxShadow: const [
-                          BoxShadow(
-                            blurRadius: 10,
-                            color: Color.fromARGB(96, 0, 0, 0)
-                          )
-                        ],
+                      color: const Color(0xFFD81B60),
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: const [
+                        BoxShadow(
+                            blurRadius: 10, color: Color.fromARGB(96, 0, 0, 0))
+                      ],
                     ),
                     child: const Center(
-                      child: Text("Container", style:  TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color.fromARGB(255, 230, 230, 230))),
+                      child: Text("Container",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color.fromARGB(255, 230, 230, 230))),
                     ),
-
                   ),
-                                   
                 ],
-               
               ),
-              
             ),
             Padding(
-                  padding: EdgeInsets.all(5),
-                  child:  Text("Usando moldes nas Caixas para criar botões", style:  TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color.fromARGB(255, 39, 39, 39))),
+              padding: EdgeInsets.all(5),
+              child: Text("Usando moldes nas Caixas para criar botões",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Color.fromARGB(255, 39, 39, 39))),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  
                   Caixa(
-                    molde: moldeButton,  
+                    molde: moldeButton,
                     onTap: () {
                       print("Botão 01");
-                    },                 
+                    },
                     child: const Center(
-                      child: Text("Botão 01", style:  TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color.fromARGB(255, 230, 230, 230))),
+                      child: Text("Botão 01",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color.fromARGB(255, 230, 230, 230))),
                     ),
                   ),
-
                   Caixa(
-                    molde: moldeButton,  
+                    molde: moldeButton,
                     onTap: () {
                       print("Botão 02");
-                    },                  
+                    },
                     child: const Center(
-                      child: Text("Botão 02", style:  TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color.fromARGB(255, 230, 230, 230))),
+                      child: Text("Botão 02",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color.fromARGB(255, 230, 230, 230))),
                     ),
                   ),
-
-                 
-                                   
+                  Div(
+                    style: moldeButton,
+                    onTap: () {
+                      print("Div botão 03");
+                    },
+                    child: const Center(
+                      child: Text("Div botão 03",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color.fromARGB(255, 230, 230, 230))),
+                    ),
+                  )
                 ],
-               
               ),
-              
             ),
-
 
             /*
               **************************************************************
@@ -224,11 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
               **************************************************************
               **************************************************************
             */
-
-
-            
           ],
-
         ),
       ),
       floatingActionButton: FloatingActionButton(
