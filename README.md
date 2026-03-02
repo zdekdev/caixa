@@ -96,6 +96,49 @@ Div(
 );
 ```
 
+Você também pode armazenar um `DivStyle` em uma variável e **reutilizá-lo em várias `Div`**, assim como se faz com classes CSS:
+
+```dart
+// Defina o estilo uma vez...
+final buttonStyle = DivStyle(
+  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+  color: Colors.grey[200],
+  borderRadius: BorderRadius.circular(8),
+  border: Border.all(color: Colors.grey),
+  hoverStyle: DivStyle(
+    color: Colors.blue[100],
+    border: Border.all(color: Colors.blue),
+  ),
+  pressedStyle: DivStyle(
+    color: Colors.blue[300],
+  ),
+);
+
+// ...e aplique em quantas Div quiser!
+Row(
+  children: [
+    Div(
+      animationDuration: const Duration(milliseconds: 200),
+      style: buttonStyle,
+      onTap: () => print("Salvar"),
+      child: const Text("Salvar"),
+    ),
+    Div(
+      animationDuration: const Duration(milliseconds: 200),
+      style: buttonStyle,
+      onTap: () => print("Cancelar"),
+      child: const Text("Cancelar"),
+    ),
+    Div(
+      animationDuration: const Duration(milliseconds: 200),
+      style: buttonStyle,
+      onTap: () => print("Editar"),
+      child: const Text("Editar"),
+    ),
+  ],
+);
+```
+
 ### 3. Retrocompatibilidade: Usando a tradicional `Caixa` com o `Molde`
 
 Para preservar o funcionamento clássico perfeitamente, garantimos que sua sintaxe atual continuará funcionando de forma exemplar. Você cria um `Molde` e aplica na `Caixa`:
