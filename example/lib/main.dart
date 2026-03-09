@@ -207,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Caixa(
                     molde: moldeButton,
                     onTap: () {
-                      print("Botão 01");
+                      debugPrint("Botão 01");
                     },
                     child: const Center(
                       child: Text("Botão 01",
@@ -220,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Caixa(
                     molde: moldeButton,
                     onTap: () {
-                      print("Botão 02");
+                      debugPrint("Botão 02");
                     },
                     child: const Center(
                       child: Text("Botão 02",
@@ -233,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Div(
                     style: moldeButton,
                     onTap: () {
-                      print("Div botão 03");
+                      debugPrint("Div botão 03");
                     },
                     child: const Center(
                       child: Text("Div botão 03",
