@@ -310,6 +310,7 @@ class Div extends StatelessWidget {
       // Resgata o hover e pressed style do próprio style/molde ou via root params
       hoverStyle: style?.hoverStyle ?? molde?.hoverStyle ?? hoverStyle,
       pressedStyle: style?.pressedStyle ?? molde?.pressedStyle ?? pressedStyle,
+      textStyle: style?.textStyle ?? molde?.textStyle,
     );
 
     // Avalia a necessidade imperativa de ser um StatefulWidget
@@ -582,14 +583,160 @@ class DivText extends StatelessWidget {
     final inheritedStyle = _DivTextStyleScope.of(context);
     // Cascata: estilo herdado como base, estilo local sobrescreve
     final effectiveStyle = inheritedStyle?.merge(style) ?? style;
+    final textStyle = effectiveStyle?.toTextStyle();
+
+    if (_hasInlineFormatting(data)) {
+      return Text.rich(
+        TextSpan(
+          style: textStyle,
+          children: _parseInlineSpans(data),
+        ),
+        textAlign: effectiveStyle?.textAlign,
+        overflow: effectiveStyle?.overflow,
+        maxLines: effectiveStyle?.maxLines,
+        softWrap: effectiveStyle?.softWrap,
+      );
+    }
 
     return Text(
       data,
-      style: effectiveStyle?.toTextStyle(),
+      style: textStyle,
       textAlign: effectiveStyle?.textAlign,
       overflow: effectiveStyle?.overflow,
       maxLines: effectiveStyle?.maxLines,
       softWrap: effectiveStyle?.softWrap,
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// Inline formatting helpers for DivText
+// ---------------------------------------------------------------------------
+
+/// Regex que reconhece os marcadores de formatação inline suportados por [DivText].
+///
+/// Grupos de captura:
+///   1 → conteúdo de `**bold**`
+///   2 → conteúdo de `*italic*`
+///   3 → conteúdo de `~~strikethrough~~`
+///   4 → conteúdo de `__underline__`
+///   5 → texto de `[texto]{opções}`
+///   6 → opções de `[texto]{opções}`
+final _kInlinePattern = RegExp(
+  r'\*\*(.*?)\*\*|\*(.*?)\*|~~(.*?)~~|__(.*?)__|\[([^\]]*)\]\{([^}]*)\}',
+  dotAll: true,
+);
+
+/// Retorna `true` se [text] contiver algum marcador de formatação inline.
+bool _hasInlineFormatting(String text) => _kInlinePattern.hasMatch(text);
+
+/// Converte [text] com marcadores inline em uma lista de [InlineSpan].
+/// Os spans filhos herdam o estilo do [TextSpan] pai via renderização nativa do Flutter.
+List<InlineSpan> _parseInlineSpans(String text) {
+  final spans = <InlineSpan>[];
+  int lastEnd = 0;
+
+  for (final match in _kInlinePattern.allMatches(text)) {
+    // Texto plano antes deste marcador
+    if (match.start > lastEnd) {
+      spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
+    }
+
+    if (match.group(1) != null) {
+      // **bold**
+      spans.add(TextSpan(
+        text: match.group(1),
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ));
+    } else if (match.group(2) != null) {
+      // *italic*
+      spans.add(TextSpan(
+        text: match.group(2),
+        style: const TextStyle(fontStyle: FontStyle.italic),
+      ));
+    } else if (match.group(3) != null) {
+      // ~~strikethrough~~
+      spans.add(TextSpan(
+        text: match.group(3),
+        style: const TextStyle(decoration: TextDecoration.lineThrough),
+      ));
+    } else if (match.group(4) != null) {
+      // __underline__
+      spans.add(TextSpan(
+        text: match.group(4),
+        style: const TextStyle(decoration: TextDecoration.underline),
+      ));
+    } else if (match.group(5) != null) {
+      // [texto]{opções}
+      spans.add(TextSpan(
+        text: match.group(5),
+        style: _parseSpanOptions(match.group(6)!),
+      ));
+    }
+
+    lastEnd = match.end;
+  }
+
+  // Texto plano restante
+  if (lastEnd < text.length) {
+    spans.add(TextSpan(text: text.substring(lastEnd)));
+  }
+
+  return spans;
+}
+
+/// Converte uma string de opções da sintaxe `[texto]{opções}` em um [TextStyle].
+///
+/// Opções suportadas (separadas por vírgula):
+/// - `#RRGGBB` / `#AARRGGBB` → cor
+/// - `color=#RRGGBB` → cor (forma explícita)
+/// - `size=24` / `fontSize=24` → tamanho da fonte
+/// - `bold` → negrito
+/// - `italic` → itálico
+/// - `underline` → sublinhado
+/// - `strike` / `strikethrough` → tachado
+///
+/// Exemplo: `[palavra]{#FF5733,bold,size=20}`
+TextStyle _parseSpanOptions(String options) {
+  Color? color;
+  double? fontSize;
+  FontWeight? fontWeight;
+  FontStyle? fontStyle;
+  TextDecoration? decoration;
+
+  for (final raw in options.split(',')) {
+    final opt = raw.trim();
+    if (opt.startsWith('#')) {
+      color = _hexToColor(opt);
+    } else if (opt.startsWith('color=')) {
+      color = _hexToColor(opt.substring(6).trim());
+    } else if (opt.startsWith('size=') || opt.startsWith('fontSize=')) {
+      fontSize = double.tryParse(opt.split('=').last.trim());
+    } else if (opt == 'bold') {
+      fontWeight = FontWeight.bold;
+    } else if (opt == 'italic') {
+      fontStyle = FontStyle.italic;
+    } else if (opt == 'underline') {
+      decoration = TextDecoration.underline;
+    } else if (opt == 'strike' || opt == 'strikethrough') {
+      decoration = TextDecoration.lineThrough;
+    }
+  }
+
+  return TextStyle(
+    color: color,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    fontStyle: fontStyle,
+    decoration: decoration,
+  );
+}
+
+/// Converte uma string hexadecimal (com ou sem `#`) em uma [Color].
+/// Suporta 6 dígitos (`RRGGBB`) e 8 dígitos (`AARRGGBB`).
+Color? _hexToColor(String hex) {
+  final clean = hex.replaceAll('#', '').trim();
+  if (clean.length == 6) return Color(int.parse('FF$clean', radix: 16));
+  if (clean.length == 8) return Color(int.parse(clean, radix: 16));
+  return null;
 }
