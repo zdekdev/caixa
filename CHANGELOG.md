@@ -1,3 +1,10 @@
+## 2.1.0
+
+* Adiciona `DivText` — widget de texto que herda estilo via cascata do `Div` pai
+* Adiciona `DivTextStyle` — classe de estilo tipográfico com `merge()` e operações de cascata
+* Adiciona propriedade `textStyle` no `DivStyle` para propagar estilos de texto automaticamente aos `DivText` descendentes
+* Adiciona formatação inline dentro de strings do `DivText`: negrito `**texto**`, itálico `*texto*`, tachado `~~texto~~`, sublinhado `__texto__` e estilos customizados `[texto]{#cor,bold,size=N}`
+
 ## 2.0.1
 
 * Adiciona um novo trecho na documentação do readme para melhor compreenção

@@ -20,6 +20,8 @@ Como o pacote possui a proposta de minimizar a verbosidade do `Container`, inspi
 3. **Estilos e Estados Interativos (`hoverStyle`, `pressedStyle`):** Trate de eventos de mouse (Hover em Web/Desktop) de forma nativa igual os pseudoelementos `:hover` e `:active` do CSS, tudo unificado dentro do **`DivStyle`**.
 4. **Alta Performance:** A `Div` é um `StatelessWidget`. Ela só escala sua complexidade nativamente caso encontre um ouvinte `listen`, `hoverStyle` ou `pressedStyle` nela ou em seu estilo base. Ou seja, você não terá dor de cabeça com perda de performance, mesmo empilhando várias `Div` juntas!
 5. **Animações Nativas:** Basta passar o parâmetro `animationDuration` e qualquer troca de estado ou estilo passará a ser animada suavemente (como o tradicional `transition: all` do CSS).
+6. **`DivText` e `DivTextStyle`:** Widget de texto com herança de estilo em cascata — defina `textStyle` no `DivStyle` do pai e todos os `DivText` descendentes herdam automaticamente, podendo sobrescrever localmente.
+7. **Formatação inline no `DivText`:** Destaque palavras ou trechos dentro da própria string com uma mini-linguagem inspirada no Markdown: `**negrito**`, `*itálico*`, `~~tachado~~`, `__sublinhado__` e `[texto]{#cor,bold,size=N}` para estilos totalmente customizados.
 
 ---
 
@@ -172,6 +174,113 @@ Caixa(
   ),
 );
 ```
+
+---
+
+## DivText e DivTextStyle
+
+### 4. Texto com estilo em cascata via `DivTextStyle`
+
+O `DivText` é o companheiro do `Div` para texto. Basta definir um `textStyle` dentro do `DivStyle` do `Div` pai e **todos os `DivText` descendentes herdam o estilo automaticamente**, funcionando como o `color` e `font-size` em cascata do CSS.
+
+```dart
+Div(
+  style: DivStyle(
+    padding: const EdgeInsets.all(16),
+    color: Colors.white,
+    textStyle: DivTextStyle(
+      color: Colors.black87,
+      fontSize: 15,
+      fontFamily: 'Roboto',
+    ),
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      DivText('Esse texto herda cor e fonte do pai.'),
+      DivText('Esse também — sem repetir nada!'),
+      DivText(
+        'Esse sobrescreve só o tamanho.',
+        style: DivTextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      ),
+    ],
+  ),
+);
+```
+
+Os estilos se **acumulam em cascata**: um `Div` dentro de outro `Div` mescla os `DivTextStyle` de todos os ancestrais, e o estilo local do `DivText` sempre vence ao final.
+
+```dart
+Div(
+  style: DivStyle(
+    textStyle: DivTextStyle(color: Colors.blue, fontSize: 16),
+  ),
+  child: Div(
+    style: DivStyle(
+      textStyle: DivTextStyle(fontWeight: FontWeight.bold), // acumula
+    ),
+    child: DivText('Azul, 16px e bold — herda tudo dos dois pais.'),
+  ),
+);
+```
+
+---
+
+### 5. Formatação inline dentro das strings do `DivText`
+
+O `DivText` suporta uma mini-linguagem de marcação inspirada no Markdown para destacar palavras ou trechos **dentro da própria string**, sem precisar montar um `RichText` manualmente.
+
+| Sintaxe | Resultado |
+|---|---|
+| `**texto**` | **negrito** |
+| `*texto*` | *itálico* |
+| `~~texto~~` | ~~tachado~~ |
+| `__texto__` | sublinhado |
+| `[texto]{opções}` | estilo customizado |
+
+**Opções do `[texto]{...}`** (separadas por vírgula, sem espaço entre elas):
+
+| Opção | Exemplo | Descrição |
+|---|---|---|
+| `#RRGGBB` | `#FF5733` | Cor no formato hexadecimal |
+| `#AARRGGBB` | `#80FF5733` | Hex com canal alfa |
+| `color=#RRGGBB` | `color=#1E90FF` | Cor (forma explícita) |
+| `size=N` / `fontSize=N` | `size=20` | Tamanho da fonte |
+| `bold` | | Negrito |
+| `italic` | | Itálico |
+| `underline` | | Sublinhado |
+| `strike` / `strikethrough` | | Tachado |
+
+Os marcadores podem ser combinados livremente com o `DivTextStyle` herdado do pai — o span inline adiciona ou sobrescreve apenas as propriedades que declare:
+
+```dart
+// Exemplo 1: destaque de cor num trecho
+DivText('**Lorem Ipsum** is simply [dummy text]{#FF5733} of the printing.');
+
+// Exemplo 2: combinação de opções
+DivText('[Clique aqui]{#1E90FF,bold,underline} para continuar.');
+
+// Exemplo 3: preço em destaque
+DivText('Valor: [R\$ 59,90]{#2ECC71,size=22,bold} por mês.');
+
+// Exemplo 4: vários marcadores estilo Markdown
+DivText('*Atenção:* ~~versão antiga~~ __nova versão disponível__.');
+
+// Exemplo 5: dentro de um Div com cascata ativa
+Div(
+  style: DivStyle(
+    textStyle: DivTextStyle(color: Colors.black87, fontSize: 16),
+  ),
+  child: Column(
+    children: [
+      DivText('Texto normal herdado do pai.'),
+      DivText('Palavra [importante]{#E74C3C,bold} no meio da frase.'),
+    ],
+  ),
+);
+```
+
+> **Dica de segurança de caracteres:** um `*` ou `[` isolado (sem o par correspondente) é tratado como texto literal — você não precisa escapar caracteres em strings normais. Apenas o padrão completo (`**…**`, `[…]{…}`, etc.) é interpretado como marcação. Se a string não contiver nenhum marcador, o widget usa um `Text` simples sem nenhum custo extra.
 
 ---
 
