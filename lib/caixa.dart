@@ -36,6 +36,9 @@ class DivStyle {
   /// Estilo a ser aplicado quando o widget estiver sendo pressionado (Clicado/Tapped)
   final DivStyle? pressedStyle;
 
+  /// Estilo de texto propagado via cascata para todos os [DivText] descendentes.
+  final DivTextStyle? textStyle;
+
   const DivStyle({
     this.child,
     this.clipBehavior,
@@ -56,6 +59,7 @@ class DivStyle {
     this.animationDuration,
     this.hoverStyle,
     this.pressedStyle,
+    this.textStyle,
   });
 
   /// Mescla estilos. Propriedades não nulas em [other] substituem as propriedades atuais.
@@ -81,8 +85,129 @@ class DivStyle {
       animationDuration: other.animationDuration ?? animationDuration,
       hoverStyle: other.hoverStyle ?? hoverStyle,
       pressedStyle: other.pressedStyle ?? pressedStyle,
+      textStyle: other.textStyle != null
+          ? (textStyle?.merge(other.textStyle!) ?? other.textStyle)
+          : textStyle,
     );
   }
+}
+
+/// Define o estilo de texto CSS-inspired para [DivText].
+/// Similar ao [DivStyle], mas voltado para propriedades tipográficas.
+class DivTextStyle {
+  final Color? color;
+  final double? fontSize;
+  final FontWeight? fontWeight;
+  final FontStyle? fontStyle;
+  final String? fontFamily;
+  final List<String>? fontFamilyFallback;
+  final double? letterSpacing;
+  final double? wordSpacing;
+
+  /// Altura de linha (equivalente ao `line-height` do CSS).
+  final double? height;
+  final TextAlign? textAlign;
+  final TextDecoration? decoration;
+  final Color? decorationColor;
+  final TextDecorationStyle? decorationStyle;
+  final double? decorationThickness;
+  final TextOverflow? overflow;
+  final int? maxLines;
+  final bool? softWrap;
+  final List<Shadow>? shadows;
+  final TextBaseline? textBaseline;
+  final TextLeadingDistribution? leadingDistribution;
+
+  const DivTextStyle({
+    this.color,
+    this.fontSize,
+    this.fontWeight,
+    this.fontStyle,
+    this.fontFamily,
+    this.fontFamilyFallback,
+    this.letterSpacing,
+    this.wordSpacing,
+    this.height,
+    this.textAlign,
+    this.decoration,
+    this.decorationColor,
+    this.decorationStyle,
+    this.decorationThickness,
+    this.overflow,
+    this.maxLines,
+    this.softWrap,
+    this.shadows,
+    this.textBaseline,
+    this.leadingDistribution,
+  });
+
+  /// Mescla estilos de texto. Propriedades não nulas em [other] substituem as propriedades atuais.
+  DivTextStyle merge(DivTextStyle? other) {
+    if (other == null) return this;
+    return DivTextStyle(
+      color: other.color ?? color,
+      fontSize: other.fontSize ?? fontSize,
+      fontWeight: other.fontWeight ?? fontWeight,
+      fontStyle: other.fontStyle ?? fontStyle,
+      fontFamily: other.fontFamily ?? fontFamily,
+      fontFamilyFallback: other.fontFamilyFallback ?? fontFamilyFallback,
+      letterSpacing: other.letterSpacing ?? letterSpacing,
+      wordSpacing: other.wordSpacing ?? wordSpacing,
+      height: other.height ?? height,
+      textAlign: other.textAlign ?? textAlign,
+      decoration: other.decoration ?? decoration,
+      decorationColor: other.decorationColor ?? decorationColor,
+      decorationStyle: other.decorationStyle ?? decorationStyle,
+      decorationThickness: other.decorationThickness ?? decorationThickness,
+      overflow: other.overflow ?? overflow,
+      maxLines: other.maxLines ?? maxLines,
+      softWrap: other.softWrap ?? softWrap,
+      shadows: other.shadows ?? shadows,
+      textBaseline: other.textBaseline ?? textBaseline,
+      leadingDistribution: other.leadingDistribution ?? leadingDistribution,
+    );
+  }
+
+  /// Converte para o [TextStyle] nativo do Flutter.
+  TextStyle toTextStyle() {
+    return TextStyle(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      fontStyle: fontStyle,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+      letterSpacing: letterSpacing,
+      wordSpacing: wordSpacing,
+      height: height,
+      decoration: decoration,
+      decorationColor: decorationColor,
+      decorationStyle: decorationStyle,
+      decorationThickness: decorationThickness,
+      shadows: shadows,
+      textBaseline: textBaseline,
+      leadingDistribution: leadingDistribution,
+    );
+  }
+}
+
+/// Propaga o [DivTextStyle] implicitamente para todos os [DivText] descendentes.
+class _DivTextStyleScope extends InheritedWidget {
+  final DivTextStyle effectiveStyle;
+
+  const _DivTextStyleScope({
+    required this.effectiveStyle,
+    required super.child,
+  });
+
+  static DivTextStyle? of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<_DivTextStyleScope>()
+        ?.effectiveStyle;
+  }
+
+  @override
+  bool updateShouldNotify(_DivTextStyleScope oldWidget) => true;
 }
 
 /// Um "Container" super poderoso inspirado pela tag "Div" do HTML mas feito para o Flutter.
@@ -200,16 +325,24 @@ class Div extends StatelessWidget {
           defaultClip: clipBehavior);
     } else {
       // Totalmente stateless + performático para caixas comuns
-      return _buildStaticContent(baseState);
+      return _buildStaticContent(context, baseState);
     }
   }
 
-  Widget _buildStaticContent(DivStyle state) {
+  Widget _buildStaticContent(BuildContext context, DivStyle state) {
     final effectiveClip = state.clipBehavior ?? clipBehavior;
     final effectiveShape = state.shape ?? shape;
     final hasTap = onTap != null;
 
     Widget content = state.child ?? const SizedBox.shrink();
+
+    // Propaga o DivTextStyle para os filhos via cascata
+    if (state.textStyle != null) {
+      final parentStyle = _DivTextStyleScope.of(context);
+      final mergedStyle =
+          parentStyle?.merge(state.textStyle!) ?? state.textStyle!;
+      content = _DivTextStyleScope(effectiveStyle: mergedStyle, child: content);
+    }
 
     if (hasTap) {
       content = Material(
@@ -308,6 +441,15 @@ class _InteractiveDivState extends State<_InteractiveDiv> {
     final hasTap = widget.onTap != null;
 
     Widget content = effectiveState.child ?? const SizedBox.shrink();
+
+    // Propaga o DivTextStyle para os filhos via cascata
+    if (effectiveState.textStyle != null) {
+      final parentStyle = _DivTextStyleScope.of(context);
+      final mergedStyle = parentStyle?.merge(effectiveState.textStyle!) ??
+          effectiveState.textStyle!;
+      content = _DivTextStyleScope(effectiveStyle: mergedStyle, child: content);
+    }
+
     if (hasTap) {
       content = Material(
         color: Colors.transparent,
@@ -404,6 +546,50 @@ class _InteractiveDivState extends State<_InteractiveDiv> {
         shape: effectiveShape,
       ),
       child: content,
+    );
+  }
+}
+
+/// Um widget de texto que herda automaticamente o [DivTextStyle] do [Div] pai
+/// mais próximo via cascata, podendo sobrescrever com um estilo local.
+///
+/// Exemplo básico:
+/// ```dart
+/// Div(
+///   style: DivStyle(
+///     textStyle: DivTextStyle(color: Colors.blue, fontSize: 16),
+///   ),
+///   child: Column(children: [
+///     DivText('Herda o estilo azul do pai'),
+///     DivText('Sobrescreve só o tamanho', style: DivTextStyle(fontSize: 24)),
+///   ]),
+/// )
+/// ```
+class DivText extends StatelessWidget {
+  final String data;
+
+  /// Estilo local deste texto. Sobrescreve propriedades herdadas do [Div] pai.
+  final DivTextStyle? style;
+
+  const DivText(
+    this.data, {
+    super.key,
+    this.style,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final inheritedStyle = _DivTextStyleScope.of(context);
+    // Cascata: estilo herdado como base, estilo local sobrescreve
+    final effectiveStyle = inheritedStyle?.merge(style) ?? style;
+
+    return Text(
+      data,
+      style: effectiveStyle?.toTextStyle(),
+      textAlign: effectiveStyle?.textAlign,
+      overflow: effectiveStyle?.overflow,
+      maxLines: effectiveStyle?.maxLines,
+      softWrap: effectiveStyle?.softWrap,
     );
   }
 }

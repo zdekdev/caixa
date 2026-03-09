@@ -1,3 +1,7 @@
+## 2.0.1
+
+* Adiciona um novo trecho na documentação do readme para melhor compreenção
+
 ## 2.0.0
 
 * Nesta atualização 2.0.0, introduzimos a classe **`Div`** (e `DivStyle`), trazendo gerenciamento de **estado automático** e controle de eventos de mouse (hover/click) idênticos ao CSS, **tudo sem quebrar as suas implementações antigas (Caixa / Molde)
