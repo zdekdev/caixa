@@ -1,7 +1,7 @@
 name: caixa
 description: "Agora o pacote Caixa é Div, crie interfaces Flutter com a agilidade usando a classe Div! Inspirado no HTML, gerencie estilos, interações (hover/click), animações e estado automático em um único widget mantendo código limpo."
 version: 2.1.1
-homepage: "https://github.com/RJ4G5/caixa"
+homepage: "https://github.com/zdekdev/caixa"
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
