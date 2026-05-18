@@ -236,8 +236,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       debugPrint("Div botão 03");
                     },
                     child: const Center(
-                      child: Text("Div botão 03",
-                          style: TextStyle(
+                      child: DivText(
+                          "Div botão 03 [[s]{#78909c} [start]{#9fa8da,bold} id]",
+                          style: DivTextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: Color.fromARGB(255, 230, 230, 230))),
