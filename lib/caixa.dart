@@ -623,7 +623,7 @@ class DivText extends StatelessWidget {
 ///   5 → texto de `[texto]{opções}`
 ///   6 → opções de `[texto]{opções}`
 final _kInlinePattern = RegExp(
-  r'\*\*(.*?)\*\*|\*(.*?)\*|~~(.*?)~~|__(.*?)__|\[([^\]]*)\]\{([^}]*)\}',
+  r'\*\*(.*?)\*\*|\*(.*?)\*|~~(.*?)~~|__(.*?)__|\[([^\[\]]*)\]\{([^}]*)\}',
   dotAll: true,
 );
 

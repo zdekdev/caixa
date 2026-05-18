@@ -1,3 +1,7 @@
+## 2.1.1
+
+* Corrige bug na formatação inline `[texto]{opções}` do `DivText` onde colchetes consecutivos (`[[texto]{...}`) ou chaves antes do colchete (`{[texto]{...}`) faziam o colchete de abertura ser capturado incorretamente como parte do texto a ser estilizado
+
 ## 2.1.0
 
 * Adiciona `DivText` — widget de texto que herda estilo via cascata do `Div` pai
